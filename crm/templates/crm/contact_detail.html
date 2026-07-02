@@ -1,0 +1,57 @@
+{% extends "crm/base.html" %}
+{% block title %}{{ contact.full_name }} - Clover CRM{% endblock %}
+{% block content %}
+<a href="{% url 'contact_list' %}" class="text-xs text-stone-500 hover:underline">&larr; Back to contacts</a>
+<h1 class="text-xl font-medium mt-2 mb-6">{{ contact.full_name }}</h1>
+
+<div class="grid grid-cols-3 gap-6">
+  <div class="col-span-2 bg-white border border-stone-200 rounded-lg p-5">
+    <dl class="grid grid-cols-2 gap-4 text-sm">
+      <div><dt class="text-stone-500 text-xs mb-1">Email</dt><dd>{{ contact.email }}</dd></div>
+      <div><dt class="text-stone-500 text-xs mb-1">Phone</dt><dd>{{ contact.phone|default:"-" }}</dd></div>
+      <div><dt class="text-stone-500 text-xs mb-1">Company</dt><dd>{{ contact.company|default:"-" }}</dd></div>
+      <div><dt class="text-stone-500 text-xs mb-1">Role</dt><dd>{{ contact.role|default:"-" }}</dd></div>
+    </dl>
+
+    <h2 class="text-sm font-medium mt-6 mb-2">Consent history</h2>
+    <div class="text-sm divide-y divide-stone-100">
+      {% for log in consent_logs %}
+      <div class="py-2 flex justify-between">
+        <span>{{ log.get_status_display }} &middot; {{ log.source }}</span>
+        <span class="text-xs text-stone-400">{{ log.recorded_at|date:"d M Y" }}</span>
+      </div>
+      {% empty %}
+      <p class="text-xs text-stone-400 py-2">No consent history recorded yet.</p>
+      {% endfor %}
+    </div>
+
+    <h2 class="text-sm font-medium mt-6 mb-2">Notes</h2>
+    <div class="text-sm divide-y divide-stone-100">
+      {% for note in activities %}
+      <div class="py-2">
+        <p>{{ note.note }}</p>
+        <p class="text-xs text-stone-400">{{ note.created_at|date:"d M Y H:i" }}</p>
+      </div>
+      {% empty %}
+      <p class="text-xs text-stone-400 py-2">No notes yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="bg-white border border-stone-200 rounded-lg p-5 h-fit">
+    <h2 class="text-sm font-medium mb-3">Data rights</h2>
+    {% if user.profile.is_admin %}
+    <form method="post" class="space-y-2">
+      {% csrf_token %}
+      <button type="submit" name="action" value="export" class="w-full text-sm border border-stone-300 rounded-lg py-2 hover:bg-stone-50">Export data (JSON)</button>
+      <button type="submit" name="action" value="erase"
+              onclick="return confirm(&quot;Anonymise this contact's personal data? This can't be undone.&quot;);"
+              class="w-full text-sm border border-red-200 text-red-700 rounded-lg py-2 hover:bg-red-50">Erase personal data</button>
+    </form>
+    <p class="text-xs text-stone-400 mt-3">Every export and erasure is recorded in the audit log.</p>
+    {% else %}
+    <p class="text-xs text-stone-400">Only admins can export or erase contact data.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

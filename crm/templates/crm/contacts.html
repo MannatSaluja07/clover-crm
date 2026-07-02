@@ -1,0 +1,39 @@
+{% extends "crm/base.html" %}
+{% block title %}Contacts - Clover CRM{% endblock %}
+{% block content %}
+<h1 class="text-xl font-medium mb-6">Contacts</h1>
+<div class="bg-white border border-stone-200 rounded-lg overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-stone-200 text-left text-xs text-stone-500">
+        <th class="px-4 py-2 font-normal">Name</th>
+        <th class="px-4 py-2 font-normal">Company</th>
+        <th class="px-4 py-2 font-normal">Consent</th>
+        <th class="px-4 py-2 font-normal"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in contacts %}
+      <tr class="border-b border-stone-100 last:border-0">
+        <td class="px-4 py-3">{{ contact.full_name }}</td>
+        <td class="px-4 py-3 text-stone-500">{{ contact.company|default:"-" }}</td>
+        <td class="px-4 py-3">
+          {% if contact.consent_status == "granted" %}
+            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs px-2 py-0.5 rounded-full">Granted</span>
+          {% elif contact.consent_status == "pending" %}
+            <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full">Pending</span>
+          {% else %}
+            <span class="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs px-2 py-0.5 rounded-full">Withdrawn</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-right">
+          <a href="{% url 'contact_detail' contact.pk %}" class="text-emerald-700 hover:underline text-xs">View</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="px-4 py-6 text-center text-stone-400">No contacts yet. Add some via /admin/.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

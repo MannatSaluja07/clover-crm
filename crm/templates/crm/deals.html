@@ -1,0 +1,23 @@
+{% extends "crm/base.html" %}
+{% block title %}Deals - Clover CRM{% endblock %}
+{% block content %}
+<h1 class="text-xl font-medium mb-6">Deals</h1>
+<div class="grid grid-cols-4 gap-4">
+  {% for stage, deals in pipeline.items %}
+  <div>
+    <p class="text-xs text-stone-500 mb-2 capitalize">{{ stage }} &middot; {{ deals|length }}</p>
+    {% for deal in deals %}
+    <div class="bg-white border border-stone-200 rounded-lg p-3 mb-2">
+      <p class="text-sm font-medium">{{ deal.title }}</p>
+      <p class="text-xs text-stone-500">&euro;{{ deal.value|floatformat:0 }}</p>
+      {% if deal.contact %}
+      <p class="text-xs text-stone-400 mt-1">{{ deal.contact }}</p>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-xs text-stone-400">No deals at this stage.</p>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
