@@ -43,11 +43,25 @@ for the Django admin (also doubles as your audit log viewer).
 
 - Swap the Tailwind CDN `<script>` tag for a proper build (django-tailwind
   or a Vite/PostCSS pipeline) before deploying
-- Add authentication + role-based permissions (admin / sales / manager)
 - Move `SECRET_KEY` and database credentials to environment variables
 - Point `DATABASES` at PostgreSQL (RDS) instead of SQLite
-- Add CI: linting (`ruff`/`flake8`), tests (`pytest-django`), a SonarQube
-  scan, and a dependency vulnerability scan (`pip-audit`)
+- Add a SonarQube scan alongside the existing CI checks
 - Containerise with Docker and deploy to EC2 behind an ALB, DB in a
   private subnet — see `COMPLIANCE.md` for the infra-level items to add
   alongside it
+
+## CI
+
+Every push to `main` runs via GitHub Actions (`.github/workflows/ci.yml`):
+lint (`ruff`), the Django test suite (`pytest`, covering auth, roles, and
+the GDPR export/erase actions), and a dependency vulnerability check
+(`pip-audit`).
+
+Run the same checks locally before pushing:
+
+```bash
+pip install -r requirements-dev.txt
+ruff check .
+pytest -v
+```
+
