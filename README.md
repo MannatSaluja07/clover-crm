@@ -1,5 +1,7 @@
 # Clover CRM
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MannatSaluja07_clover-crm&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=MannatSaluja07_clover-crm)
+
 A small CRM built in Django, with GDPR-aware data handling (consent
 tracking, audit logging, export and erasure) as its core differentiator.
 See `COMPLIANCE.md` for the data protection write-up.
