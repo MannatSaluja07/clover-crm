@@ -67,3 +67,15 @@ ruff check .
 pytest -v
 ```
 
+
+## Screenshots
+
+### Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Contact detail - GDPR export and erase
+![Contact detail](docs/screenshots/contact-detail.png)
+
+### CI pipeline passing
+![CI passing](docs/screenshots/ci-passing.png)
+
