@@ -9,7 +9,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-clover_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-clover_user} -d ${DB_NAME:-clover_crm}"]
       interval: 5s
       timeout: 5s
       retries: 5
