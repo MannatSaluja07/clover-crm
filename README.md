@@ -1,7 +1,5 @@
 # Clover CRM
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MannatSaluja07_clover-crm&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=MannatSaluja07_clover-crm)
-
 A small CRM built in Django, with GDPR-aware data handling (consent
 tracking, audit logging, export and erasure) as its core differentiator.
 See `COMPLIANCE.md` for the data protection write-up.
@@ -45,12 +43,51 @@ for the Django admin (also doubles as your audit log viewer).
 
 - Swap the Tailwind CDN `<script>` tag for a proper build (django-tailwind
   or a Vite/PostCSS pipeline) before deploying
-- Move `SECRET_KEY` and database credentials to environment variables
-- Point `DATABASES` at PostgreSQL (RDS) instead of SQLite
-- Add a SonarQube scan alongside the existing CI checks
-- Containerise with Docker and deploy to EC2 behind an ALB, DB in a
-  private subnet — see `COMPLIANCE.md` for the infra-level items to add
-  alongside it
+- Add a SonarQube scan alongside the existing CI checks (done — see
+  SonarCloud badge above)
+- Put the EC2 instance behind an Application Load Balancer with a TLS
+  certificate, and move the database into a private subnet (currently the
+  Postgres container runs alongside the app on the same instance for
+  simplicity)
+
+## Deployment (Docker + PostgreSQL + AWS EC2)
+
+The app is containerised and runs with PostgreSQL instead of SQLite in
+this configuration. See `terraform/README.md` for provisioning the EC2
+instance, and the steps below for deploying onto it once it exists.
+
+**Run it locally with Docker first** (recommended before deploying):
+
+```bash
+cp .env.example .env
+# edit .env and set real values for DB_PASSWORD and DJANGO_SECRET_KEY
+docker compose up --build
+```
+
+Visit `http://localhost:8000/`. This runs the exact same containers that
+go on EC2, so if it works here, it'll work there.
+
+**Deploying to EC2:**
+
+1. Provision the instance with Terraform — see `terraform/README.md`
+2. SSH into the instance (Terraform prints the command)
+3. Clone the repo onto the instance:
+   ```bash
+   git clone https://github.com/MannatSaluja07/clover-crm.git
+   cd clover-crm
+   cp .env.example .env
+   nano .env   # set real DB_PASSWORD and DJANGO_SECRET_KEY
+   ```
+4. Start the containers:
+   ```bash
+   sudo docker compose up --build -d
+   ```
+5. Create a superuser and load demo data:
+   ```bash
+   sudo docker compose exec web python manage.py createsuperuser
+   sudo docker compose exec web python manage.py seed_data
+   ```
+6. Visit `http://<instance-public-ip>:8000/`
 
 ## CI
 
@@ -66,16 +103,4 @@ pip install -r requirements-dev.txt
 ruff check .
 pytest -v
 ```
-
-
-## Screenshots
-
-### Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
-
-### Contact detail - GDPR export and erase
-![Contact detail](docs/screenshots/contact-detail.png)
-
-### CI pipeline passing
-![CI passing](docs/screenshots/ci-passing.png)
 

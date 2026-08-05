@@ -4,3 +4,6 @@ db.sqlite3
 venv/
 .env
 staticfiles/
+*.tfstate
+*.tfstate.backup
+.terraform/
